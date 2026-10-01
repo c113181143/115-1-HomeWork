@@ -1,0 +1,12 @@
+# SID: C113181143<BR>
+# Name: Smith<BR>
+EX01
+<HR>
+<?php
+echo "PHP與MySQL網頁設計<br/>";
+?>
+<?php
+echo "PHP與MySQL網頁";
+echo "設計<br/>";
+?>
+<?php echo "PHP與MySQL網頁設計<br/>" ?>
