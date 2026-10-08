@@ -1,13 +1,12 @@
 <?php
-$grade = 80;
-
-if ($grade >= 80) {
-    echo "甲等";
-} elseif ($grade >= 70) {
-    echo "乙等";
-} elseif ($grade >= 60) {
-    echo "丙等";
-} else {
-    echo "丁等";
+$result = 0;
+$n = 0;
+while ($result <= 10) {
+    $result = $result * $n;
+    echo "|" . $result;
+    $n = $n + 1;
+    echo "|" . $n;
+    $result++;
 }
-?>
+$n = $n - 1;
+echo "result: " . $result;
