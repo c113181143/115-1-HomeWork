@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>船隻靠泊時間判定系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- 主容器 -->
+    <div class="w-full max-w-2xl bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden my-8">
+        
+        <!-- 標題欄 -->
+        <div class="bg-slate-950 p-6 border-b border-slate-800 flex items-center space-x-3">
+            <div class="p-3 bg-blue-600 rounded-xl text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H7" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">船隻靠泊時間判定系統</h1>
+                <p class="text-slate-400 text-sm">港口碼頭作業管理面板</p>
+            </div>
+        </div>
+
+        <!-- 內容區塊 -->
+        <div class="p-6 md:p-8 space-y-6">
+            
+            <!-- 輸入區塊 -->
+            <form id="calcForm" onsubmit="calculateBerth(event)" class="space-y-4">
+                <div>
+                    <label for="hoursInput" class="block text-sm font-medium text-slate-300 mb-2">
+                        靠泊時間（小時）
+                    </label>
+                    <div class="relative rounded-lg shadow-sm">
+                        <input 
+                            type="text" 
+                            id="hoursInput" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            placeholder="例如：20 或 19.5"
+                            autocomplete="off"
+                        >
+                        <button 
+                            type="button" 
+                            onclick="clearInput()" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs bg-slate-800 px-2 py-1 rounded"
+                        >
+                            清除
+                        </button>
+                    </div>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-3 rounded-xl transition duration-150 shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <span>判定靠泊類型</span>
+                </button>
+            </form>
+
+            <!-- 結果顯示卡片 -->
+            <div id="resultCard" class="hidden p-5 rounded-xl border transition-all duration-300">
+                <div class="flex items-center space-x-3">
+                    <div id="resultIcon" class="p-2 rounded-lg"></div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">判定結果</div>
+                        <div id="resultText" class="text-xl font-bold mt-0.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-slate-700/60 my-6">
+
+            <!-- 快捷測試案例面板 (測試表 1 ~ 8 項) -->
+            <div>
+                <h3 class="text-sm font-semibold text-slate-400 mb-3 flex items-center justify-between">
+                    <span>快捷測試工具（測試表 1-8）</span>
+                    <span class="text-xs text-slate-500 font-normal">點擊自動代入並測試</span>
+                </h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <button onclick="runTestCase('20')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#1 剛好邊界</div>
+                        <div class="text-slate-400 truncate">輸入: "20"</div>
+                    </button>
+
+                    <button onclick="runTestCase('19.9')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#2 邊界下方</div>
+                        <div class="text-slate-400 truncate">輸入: "19.9"</div>
+                    </button>
+
+                    <button onclick="runTestCase('')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#3 空白輸入</div>
+                        <div class="text-slate-400 truncate">輸入: ""</div>
+                    </button>
+
+                    <button onclick="runTestCase('-5')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#4 負數測試</div>
+                        <div class="text-slate-400 truncate">輸入: "-5"</div>
+                    </button>
+
+                    <button onclick="runTestCase('abc')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#5 非數字</div>
+                        <div class="text-slate-400 truncate">輸入: "abc"</div>
+                    </button>
+
+                    <button onclick="runTestCase('25hr')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#6 帶單位</div>
+                        <div class="text-slate-400 truncate">輸入: "25hr"</div>
+                    </button>
+
+                    <button onclick="runTestCase('二十')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-blue-400">#7 中文數字</div>
+                        <div class="text-slate-400 truncate">輸入: "二十"</div>
+                    </button>
+
+                    <button onclick="runTestCase('e')" class="test-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs p-2.5 rounded-lg text-left border border-slate-700 transition">
+                        <div class="font-bold text-amber-400">#8 易壞案例 (e)</div>
+                        <div class="text-slate-400 truncate">輸入: "e"</div>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 mt-2">
+                    <button onclick="runTestCase('0')" class="test-btn bg-slate-700/30 hover:bg-slate-700 text-slate-300 text-xs p-2 rounded-lg text-left border border-slate-700/50 transition">
+                        <span class="text-slate-400">#8 測零: </span><span class="font-mono text-white">0</span>
+                    </button>
+                    <button onclick="runTestCase('1e10')" class="test-btn bg-slate-700/30 hover:bg-slate-700 text-slate-300 text-xs p-2 rounded-lg text-left border border-slate-700/50 transition">
+                        <span class="text-slate-400">#8 科學記號: </span><span class="font-mono text-white">1e10</span>
+                    </button>
+                    <button onclick="runTestCase('<script>')" class="test-btn bg-slate-700/30 hover:bg-slate-700 text-slate-300 text-xs p-2 rounded-lg text-left border border-slate-700/50 transition">
+                        <span class="text-slate-400">#8 XSS腳本: </span><span class="font-mono text-white">&lt;script&gt;</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 判定核心邏輯
+         * @param {Event} e - 表單提交事件
+         */
+        function calculateBerth(e) {
+            if (e) e.preventDefault();
+
+            const inputEl = document.getElementById('hoursInput');
+            const rawValue = inputEl.value;
+
+            // 1. 空白檢查 (Trim 後長度為 0)
+            if (rawValue === null || rawValue.trim() === "") {
+                showResult("請輸入靠泊時間", "warning");
+                return;
+            }
+
+            const trimmedVal = rawValue.trim();
+
+            // 2. 嚴格判斷是否為純合法數字格式 (避免 "25hr", "abc", "二十", 單獨 "e" 或科學記號字元)
+            // 正則說明：允許可選正負號，整數或小數，禁止英文與單位
+            // 由於測試情境中將科學記號 'e' / '1e10' 視為異常或特殊輸入，我們一律限制非標準數字輸入為「請輸入有效的數字」
+            const strictNumberRegex = /^-?\d+(\.\d+)?$/;
+
+            if (!strictNumberRegex.test(trimmedVal)) {
+                showResult("請輸入有效的數字", "error");
+                return;
+            }
+
+            // 轉為數字形態
+            const hours = Number(trimmedVal);
+
+            // 3. 檢查 NaN
+            if (isNaN(hours)) {
+                showResult("請輸入有效的數字", "error");
+                return;
+            }
+
+            // 4. 負數檢查
+            if (hours < 0) {
+                showResult("時間不能為負數", "error");
+                return;
+            }
+
+            // 5. 靠泊時間業務邏輯判定 (滿 20 小時為長時間靠泊，否則為一般靠泊)
+            if (hours >= 20) {
+                showResult("長時間靠泊", "success-long");
+            } else {
+                showResult("一般靠泊", "success-normal");
+            }
+        }
+
+        /**
+         * 顯示結果畫面與樣式控制
+         */
+        function showResult(message, type) {
+            const card = document.getElementById('resultCard');
+            const text = document.getElementById('resultText');
+            const icon = document.getElementById('resultIcon');
+
+            card.classList.remove('hidden');
+
+            if (type === 'success-long') {
+                // 長時間靠泊 (紫藍色調)
+                card.className = "p-5 rounded-xl border bg-indigo-950/60 border-indigo-500/50 text-indigo-200";
+                icon.className = "p-3 rounded-xl bg-indigo-600 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                text.innerText = message;
+            } else if (type === 'success-normal') {
+                // 一般靠泊 (綠色調)
+                card.className = "p-5 rounded-xl border bg-emerald-950/60 border-emerald-500/50 text-emerald-200";
+                icon.className = "p-3 rounded-xl bg-emerald-600 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                text.innerText = message;
+            } else if (type === 'warning') {
+                // 未輸入提示 (黃色調)
+                card.className = "p-5 rounded-xl border bg-amber-950/60 border-amber-500/50 text-amber-200";
+                icon.className = "p-3 rounded-xl bg-amber-600 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                text.innerText = message;
+            } else {
+                // 錯誤/無效字串 (紅色調)
+                card.className = "p-5 rounded-xl border bg-rose-950/60 border-rose-500/50 text-rose-200";
+                icon.className = "p-3 rounded-xl bg-rose-600 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                text.innerText = message;
+            }
+        }
+
+        /**
+         * 快速測試案例執行器
+         */
+        function runTestCase(value) {
+            const inputEl = document.getElementById('hoursInput');
+            inputEl.value = value;
+            calculateBerth();
+        }
+
+        /**
+         * 清除輸入與結果
+         */
+        function clearInput() {
+            document.getElementById('hoursInput').value = '';
+            document.getElementById('resultCard').classList.add('hidden');
+            document.getElementById('hoursInput').focus();
+        }
+    </script>
+</body>
+</html>
