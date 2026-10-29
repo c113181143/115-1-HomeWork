@@ -1,6 +1,6 @@
 <?php
 require("about_me.php");
-echo "ch07-1<br/>";
+echo "W08-EX01</BR>";
 
 $str1 = "PHP and MySQL Web Programming"; // 字串變數
 $str2 = " PHP與MySQL網頁設計範例教本 ";
