@@ -1,4 +1,6 @@
 <?php
+// 相容 PHP 8 的自訂 each() 函式
+
 function each(&$array)
 {
     $res = array();
@@ -12,10 +14,12 @@ function each(&$array)
     }
     return $res;
 }
-?>
 
+include "about_me.php";
+echo "W10-EX02<br/><hr/>";
+?>
 <table border="0">
-    <tr bgcolor="#b921ad">
+    <tr bgcolor="#CC99FF">
         <td>功能</td>
         <td>編號</td>
         <td>名稱</td>
@@ -32,12 +36,14 @@ function each(&$array)
                 $color = "#FF99CC";
             } else {
                 $flag = true;
-                $color = "#99FFC";
+                $color = "#99FFCC"; // 修正為標準 6 碼淺綠色
             }
             echo "<tr bgcolor='" . $color . "'><td>";
             echo "<a href='delete.php?Id=" . $arr . "'>";
             echo "刪除</a></td>";
 
+            $price = 0;
+            $quantity = 0;
             while (list($name, $value) = each($_COOKIE[$arr])) {
                 echo "<td>" . $value . "</td>";
                 if ($name == "Price")
@@ -45,19 +51,16 @@ function each(&$array)
                 if ($name == "Quantity")
                     $quantity = $value;
             }
-            $total += $price * $quantity;  // 計算總金額
+            $total += $price * $quantity; // 計算總金額
             echo "</tr>";
         }
-
     }
-    if ($total != 0) {  // 顯示總金額
+    if ($total != 0) { // 顯示總金額
         echo "<tr bgcolor=yellow><td colspan=5 align=right>";
         echo "總金額 = NT$" . $total . "元</td></tr>";
     }
     ?>
-
 </table>
-
-<HR><BR>
-<a href="catalog.php">catalog</a>
-<a href="shoppingcart.php">mini cart</a>
+<hr/>
+| <a href="catalog.php">Catalog</a> |
+<a href="shoppingcart.php">Mini Cart</a>

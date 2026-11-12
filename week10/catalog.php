@@ -1,11 +1,14 @@
 <?php
-session_start();
+include "about_me.php";
+echo "W10-EX02<br/><hr/>";
+session_start(); // 啟用交談期
 
-if (isset($_POST["Item"]) ) {
+if (isset($_POST["Item"])) {
     $_SESSION["Quantity"] = $_POST["Quantity"];
-    $id =$_POST["Item"];
+    $id = $_POST["Item"];
+    $_SESSION["ID"] = $id; // ★ 關鍵：把商品編號存入 Session，購物車才抓得到
 
- switch (strtoupper($id)) {
+    switch (strtoupper($id)) {
         case "S001":
             $_SESSION["Name"] = "10吋平板電腦";
             $_SESSION["Price"] = 12000;
@@ -19,18 +22,21 @@ if (isset($_POST["Item"]) ) {
             $_SESSION["Price"] = 21000;
             break;
     }
-    header("Location: savecart.php");  // 轉址    
+    header("Location: savecart.php"); // 轉址到儲存購物車頁面
+    exit();
 }
-?>
 
+
+?>
 <form action="catalog.php" method="post">
     <select name="Item">
-  <option value="S001">10吋平板電腦 - $12000</option>
-  <option value="S002">15.6吋筆記型電腦 - $27000</option>
-  <option value="S003">iPhone智慧型手機 - $21000</option> 
-</select>
-<input type="text" name="Quantity" value="1" size="5"/>
-<input type="submit" value="訂購"/>
+        <option value="S001">10吋平板電腦 - $12000</option>
+        <option value="S002">15.6吋筆記型電腦 - $27000</option>
+        <option value="S003">iPhone智慧型手機 - $21000</option>
+    </select>
+    <input type="text" name="Quantity" value="1" size="5"/>
+    <input type="submit" value="訂購"/>
 </form>
-<a href="catalog.php">catalog</a>
-<a href="shoppingcart.php">mini cart</a>
+<hr/>
+| <a href="catalog.php">Catalog</a> |
+<a href="shoppingcart.php">Mini Cart</a>
