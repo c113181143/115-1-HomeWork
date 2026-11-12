@@ -1,6 +1,6 @@
 <?php
 require("about_me.php");
-echo "W08-EX02" . "<br/>";
+echo "W08-EX01" . "<br/>";
 
 session_start();
 if (!isset($_SESSION["page_counter"])) {
